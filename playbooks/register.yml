@@ -1,0 +1,34 @@
+---
+- name: register to satellite
+  hosts: servers
+  connection: ssh
+  gather_facts: False
+  become: yes
+
+  tasks:
+
+   - name: Remove AWS Internal RPM repos
+     file:
+       state: absent
+       path: "{{ item }}"
+     with_items:
+       - "/etc/yum.repos.d/redhat-rhui-client-config.repo"
+       - "/etc/yum.repos.d/redhat-rhui.repo"
+       - "/etc/yum.repos.d/rhui-load-balancers.conf"
+
+   - name: Install Satellite rpm
+     yum:
+       name: "{{ satellite_katello_rpm }}" 
+       state: present
+
+   - name: Register to Satellite
+     redhat_subscription:
+       state: present
+       org_id: "{{ satellite_org_id }}"
+       activationkey: "{{ activation_key }}"
+
+   - name: Enable all RHSM repositories
+     rhsm_repository:
+       name: '*'
+       state: enabled
+   

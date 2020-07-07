@@ -1,0 +1,4 @@
+localhost ansible_connection=local ansible_python_interpreter=/home/jtracy/virtualenvironment/aws/bin/python2.7/site-packages
+
+[servers]
+10.0.2.126

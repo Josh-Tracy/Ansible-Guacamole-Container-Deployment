@@ -1,0 +1,65 @@
+---
+
+# Playbook will launch the database container, guacd container, and guacamole container.
+# Variables are pulled from /inventory/group_vars
+
+# Define hosts to launch containers on
+ - name: Configure DB and launch the containers
+   hosts: servers
+   gather_facts: True
+   become: yes
+   tasks:
+
+
+# Copy database initialization script to root directory
+   - name: copy DB init
+     copy:
+       src: "../files/guac_db.sql"
+       dest: /root/initdb.sql
+
+# Install docker-py with pip install docker-py first
+
+    
+# Launch guacd container
+   - name: guacd container
+     docker_container:
+       name: some-guacd
+       image: guacamole/guacd
+       state: started
+       restart_policy: unless-stopped
+
+# Launch Database Container and run the initdb script
+   - name: mariadb container
+     docker_container:
+       name: mysql
+       image: mysql/mysql-server
+       state: started
+       volumes:
+         - /root/initdb.sql:/docker-entrypoint-initdb.d/init.sql
+         - /var/lib/mysql
+       env:
+         MYSQL_DATABASE: "{{ mysql_database }}"
+         MYSQL_USER: "{{ guacamole_user }}"
+         MYSQL_PASSWORD: "{{ guacamole_pass }}"
+         MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
+       restart_policy: unless-stopped
+
+# Launch guacamole container
+   - name: guacamole container
+     docker_container:
+       name: guacamole
+       image: guacamole/guacamole
+       state: started
+       detach: yes
+       volumes:
+         - /root/opt/guacamole:/config
+       ports: 8080:8080
+       links:
+         - some-guacd:guacd
+         - mysql:mysql
+       env:
+         MYSQL_DATABASE: "{{ mysql_database }}"
+         MYSQL_USER: "{{ guacamole_user }}"
+         MYSQL_PASSWORD: "{{ guacamole_pass }}"
+         GUACAMOLE_HOME: "/config"
+       restart_policy: unless-stopped
