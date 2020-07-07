@@ -4,7 +4,7 @@
   gather_facts: false
   become: no
 
-
+# Remove old versions of docker
   tasks:
     - name: Remove docker if installed from CentOS repo
       yum:
@@ -37,7 +37,7 @@
 
     - name: Add Docker-CE stable repo
       yum_repository:
-       name: docker-ce-stable
+        name: docker-ce-stable
         description: Docker CE Stable Repo
         baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
         gpgkey: https://download.docker.com/linux/centos/gpg
@@ -46,7 +46,7 @@
     - name: Add Docker repo
       get_url:
         url: https://download.docker.com/linux/centos/docker-ce.repo
-        dest: /etc/yum.repos.d/docer-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
       become: yes
 
     - name: Enable Docker Edge repo
@@ -74,6 +74,16 @@
         state: latest
       become: yes
 
+    - name: Install Python Package Manager pip2
+      package:
+        name: python2-pip
+        state: latest
+      become: yes
+
+    - name: Install docker python module
+      pip2:
+        name: docker-py
+       
     - name: Start Docker service
       service:
         name: docker
