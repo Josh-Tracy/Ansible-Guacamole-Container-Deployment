@@ -1,5 +1,5 @@
 [servers]
-192.168.56.143
+172.31.67.84
 
-[servers:vars]
-ansible_python_interpreter=/usr/bin/python2.7
+#[servers:vars]
+#ansible_python_interpreter=/usr/bin/python2.7

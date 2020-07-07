@@ -4,8 +4,9 @@
   gather_facts: false
   become: no
 
-# Remove old versions of docker
+ 
   tasks:
+# Remove old versions of Docker. Set use_backend: yum3 for RHEL7 and yum4 for RHEL8
     - name: Remove docker if installed from CentOS repo
       yum:
         name:
@@ -18,23 +19,30 @@
           - docker-logrotate
           - docker-engine
         state: removed
-        use_backend: yum3
+        use_backend: yum4
+      become: yes
 
-   # - name: Install yum utils
-   #   yum:
-   #     name: yum-utils
-   #     state: latest
+# Install yum utils if not installed
+    - name: Install yum utils
+      yum:
+        name: yum-utils
+        state: latest
+      become: yes
 
-    #- name: Install device-mapper-persistent-data
-    #  yum:
-    #    name: device-mapper-persistent-data
-    #    state: latest
+# Install device-mapper-persisten-data if not installed
+    - name: Install device-mapper-persistent-data
+      yum:
+        name: device-mapper-persistent-data
+        state: latest
+      become: yes
 
+# Install lvm2 if needed
     #- name: Install lvm2
     #  yum:
     #     name: lvm2
     #     state: latest
 
+# Create yum repo for docker CE
     - name: Add Docker-CE stable repo
       yum_repository:
         name: docker-ce-stable
@@ -42,13 +50,16 @@
         baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
         gpgkey: https://download.docker.com/linux/centos/gpg
         gpgcheck: yes
+      become: yes
 
+# Add docker repo to yum.repos.d
     - name: Add Docker repo
       get_url:
         url: https://download.docker.com/linux/centos/docker-ce.repo
         dest: /etc/yum.repos.d/docker-ce.repo
       become: yes
 
+# Enable Repo
     - name: Enable Docker Edge repo
       ini_file:
         dest: /etc/yum.repos.d/docer-ce.repo
@@ -65,25 +76,39 @@
         value: 0
       become: yes
 
+# Yum update
     - name: Upgrade Packages
       yum: name=* state=latest
+      become: yes
 
+# In RHEL8 containerd.io will not install automatically when Docker attempts to install. Must be run independent.
+    - name: Install containerd.io (RHEL8 Only)
+      package:
+        name: https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm
+        state: latest
+      become: yes
+
+# Install Docker-ce
     - name: Install Docker
       package:
         name: docker-ce
         state: latest
       become: yes
 
+# Install pip2 in order to install docker python module
     - name: Install Python Package Manager pip2
       package:
         name: python2-pip
         state: latest
       become: yes
 
+# Install Docker Python Module using pip
     - name: Install docker python module
-      pip2:
+      pip:
         name: docker-py
-       
+      become: yes
+
+# Start the Docker service
     - name: Start Docker service
       service:
         name: docker
