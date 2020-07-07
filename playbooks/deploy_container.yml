@@ -17,8 +17,6 @@
        src: "../files/guac_db.sql"
        dest: /root/initdb.sql
 
-# Install docker-py with pip install docker-py first
-
     
 # Launch guacd container
    - name: guacd container

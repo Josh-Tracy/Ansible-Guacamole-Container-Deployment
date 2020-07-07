@@ -35,13 +35,13 @@
     #     name: lvm2
     #     state: latest
 
-    #- name: Add Docker-CE stable repo
-    #  yum_repository:
-    #   name: docker-ce-stable
-    #    description: Docker CE Stable Repo
-    #    baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
-    #    gpgkey: https://download.docker.com/linux/centos/gpg
-    #    gpgcheck: yes
+    - name: Add Docker-CE stable repo
+      yum_repository:
+       name: docker-ce-stable
+        description: Docker CE Stable Repo
+        baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+        gpgkey: https://download.docker.com/linux/centos/gpg
+        gpgcheck: yes
 
     - name: Add Docker repo
       get_url:
@@ -65,8 +65,8 @@
         value: 0
       become: yes
 
-#    - name: Upgrade Packages
-#      yum: name=* state=latest
+    - name: Upgrade Packages
+      yum: name=* state=latest
 
     - name: Install Docker
       package:
