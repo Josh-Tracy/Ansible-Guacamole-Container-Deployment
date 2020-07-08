@@ -1,6 +1,12 @@
 # Ansible-Guacamole-Container-Deployment
 Ansible Playbooks to Deploy Guacamole Containers
 
+## Status Of Playbooks on Different Operating Systems
+
+* RHEL 8 - 100% working
+* RHEL 7 - 100% Working
+* Ubuntu - Work in Progress 
+
 ## Prerequisites
 
 * (Optional) If you're on a RHEL8 system with no subscription to a repo with Ansible, install the CENTos repo using the following command: yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm 
