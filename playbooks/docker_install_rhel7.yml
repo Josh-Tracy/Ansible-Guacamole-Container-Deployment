@@ -1,0 +1,118 @@
+- name: Install docker
+  hosts: servers
+  connection: ssh
+  gather_facts: false
+  become: no
+
+ 
+  tasks:
+# Remove old versions of Docker. Set use_backend: yum3 for RHEL7 and yum4 for RHEL8
+    - name: Remove docker if installed from CentOS repo
+      yum:
+        name:
+          - docker
+          - docker-client
+          - docker-client-latest
+          - docker-common
+          - docker-latest
+          - docker-latest-logrotate
+          - docker-logrotate
+          - docker-engine
+        state: removed
+        use_backend: yum3
+      become: yes
+
+# Install yum utils if not installed
+    - name: Install yum utils
+      yum:
+        name: yum-utils
+        state: latest
+      become: yes
+
+# Install device-mapper-persisten-data if not installed
+    - name: Install device-mapper-persistent-data
+      yum:
+        name: device-mapper-persistent-data
+        state: latest
+      become: yes
+
+# Install lvm2 if needed
+    #- name: Install lvm2
+    #  yum:
+    #     name: lvm2
+    #     state: latest
+
+# Create yum repo for docker CE
+    - name: Add Docker-CE stable repo
+      yum_repository:
+        name: docker-ce-stable
+        description: Docker CE Stable Repo
+        baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+        gpgkey: https://download.docker.com/linux/centos/gpg
+        gpgcheck: yes
+      become: yes
+
+# Add docker repo to yum.repos.d
+    - name: Add Docker repo
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
+      become: yes
+
+# Enable Repo
+    - name: Enable Docker Edge repo
+      ini_file:
+        dest: /etc/yum.repos.d/docer-ce.repo
+        section: 'docker-ce-edge'
+        option: enabled
+        value: 0
+      become: yes
+
+    - name: Enable Docker Test repo
+      ini_file:
+        dest: /etc/yum.repos.d/docer-ce.repo
+        section: 'docker-ce-test'
+        option: enabled
+        value: 0
+      become: yes
+
+# Yum update
+    - name: Upgrade Packages
+      yum: name=* state=latest
+      become: yes
+
+# Installs SELinux policy modules for use with container runtimes. Required dependeny to install docker-ce
+    - name: Install container-selinux
+      package:
+        name: http://mirror.centos.org/centos/7/extras/x86_64/Packages/container-selinux-2.107-1.el7_6.noarch.rpm
+        state: latest
+      become: yes
+
+# Install Docker-ce
+    - name: Install Docker
+      package:
+        name: docker-ce
+        state: latest
+      become: yes
+
+# Install pip2 in order to install docker python module
+    - name: Install Python Package Manager pip2
+      package:
+        name: python2-pip
+        state: latest
+      become: yes
+
+# Install Docker Python Module using pip
+    - name: Install docker python module
+      pip:
+        name: docker-py
+      become: yes
+
+# Start the Docker service
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+      become: yes
+
