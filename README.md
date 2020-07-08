@@ -10,7 +10,7 @@ Ansible Playbooks to Deploy Guacamole Containers
 ## Prerequisites
 
 * (Optional RHEL8) If you're on a RHEL8 system with no subscription to a repo with Ansible, install the CENTos repo using the following command: yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm 
-8 (Optional RHEL7) If you're on a RHEL7 system with no subscription to a repo with Ansible, install the EPEL repo using the following command: yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+* (Optional RHEL7) If you're on a RHEL7 system with no subscription to a repo with Ansible, install the EPEL repo using the following command: yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 * Ansible installed. I am using Version 2.9.10
 * Define your hosts in the /inventory/hosts file
 
