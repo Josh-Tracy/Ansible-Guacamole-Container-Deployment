@@ -81,13 +81,6 @@
       yum: name=* state=latest
       become: yes
 
-# Installs SELinux policy modules for use with container runtimes. Required dependeny to install docker-ce
-    - name: Install container-selinux
-      package:
-        name: http://mirror.centos.org/centos/7/extras/x86_64/Packages/container-selinux-2.107-1.el7_6.noarch.rpm
-        state: latest
-      become: yes
-
 # Install Docker-ce
     - name: Install Docker
       package:
